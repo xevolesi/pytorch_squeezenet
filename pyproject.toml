@@ -1,0 +1,116 @@
+[tool.bandit]
+skips = ["B106"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+exclude = [
+    "venv",
+    ".github",
+    "test_data",
+    ".amlignore",
+    "Dockerfile",
+    "poetry.lock",
+    "pyproject.toml",
+]
+line-length = 120
+ignore = [
+    "E501",
+    "S101",
+    "S105",
+    "S106",
+    "PLR2004",
+    "PLR0913",
+    "N806",
+    "N803",
+    "ARG002",
+    "EXE002",
+    "PLW1510",
+    "COM812",
+    "ISC001",
+    "NPY002",
+]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "N",
+    "UP",
+    "ASYNC",
+    "S",
+    "BLE",
+    "B",
+    "C4",
+    "DTZ",
+    "T10",
+    "EM",
+    "EXE",
+    "ISC",
+    "ICN",
+    "G",
+    "INP",
+    "PIE",
+    "T20",
+    "PT",
+    "Q",
+    "RSE",
+    "RET",
+    "SIM",
+    "TID",
+    "TCH",
+    "INT",
+    "ARG",
+    "PTH",
+    "ERA",
+    "PD",
+    "PGH",
+    "PL",
+    "TRY",
+    "FLY",
+    "NPY",
+    "PERF",
+    "RUF",
+    "COM",
+]
+
+[tool.ruff.pep8-naming]
+# Allow Pydantic's `@validator` decorator to trigger class method treatment.
+classmethod-decorators = ["pydantic.validator"]
+
+[tool.ruff.per-file-ignores]
+"tests/unit/test_augmentations.py" = ["PLR0912"]
+"tests/unit/test_models.py" = ["PLR0912", "PLR0915"]
+"tests/*" = ["INP001"]
+"source/train.py" = ["INP001"]
+"__init__.py" = ["E402"]
+"test_*.py" = [
+    "S101",
+    "ANN201",
+    "ARG001",
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN201",
+]
+"conftest.py" = [
+    "S101",
+    "ANN201",
+    "ARG001",
+    "ANN001",
+    "ANN201",
+    "ANN202",
+    "ANN201",
+    "PT004",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+show_error_codes = true
+
+[tool.coverage.run]
+omit = ["tests/*", ".venv/*", "config-*", "venv/*",]
