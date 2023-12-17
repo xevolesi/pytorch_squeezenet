@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 env:
-  PYTHONPATH: ./
+  PYTHONPATH: source/${PYTHONPATH}
 
 permissions:
   contents: read
@@ -37,4 +37,4 @@ jobs:
           mypy --strict .
     - name: Test with pytest
       run: |
-        pytest -svvv tests
+          pytest -svvv tests
