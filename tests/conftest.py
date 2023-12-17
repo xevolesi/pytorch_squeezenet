@@ -2,7 +2,8 @@ import pathlib
 
 import addict
 import pytest
-from utils.general import read_config
+
+from source.utils.general import read_config
 
 _CONFIG_PATH = "config.yml"
 

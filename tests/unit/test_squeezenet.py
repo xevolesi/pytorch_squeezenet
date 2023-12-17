@@ -1,6 +1,7 @@
 import addict
 import torch
-from models import SqueezeNet
+
+from source.models import SqueezeNet
 
 
 def _assert_output(model_output: torch.Tensor, true_batch_size: int, true_n_classes: int) -> None:

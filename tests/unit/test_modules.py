@@ -1,7 +1,8 @@
 import addict
 import pytest
 import torch
-from modules import ExpandLayer, FireModule
+
+from source.modules import ExpandLayer, FireModule
 
 _RANDOM_TENSOR_SPATIAL_SIZE: tuple[int, int] = (27, 27)
 

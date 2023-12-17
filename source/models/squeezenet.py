@@ -1,6 +1,7 @@
 import torch
-from modules import FireModule
 from torch import nn
+
+from source.modules import FireModule
 
 
 class SqueezeNet(nn.Module):
