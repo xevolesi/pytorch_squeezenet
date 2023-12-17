@@ -24,4 +24,4 @@ class FireModule(nn.Module):
         self.expand_layer = ExpandLayer(squeeze_channels, out_channels // 2, out_channels // 2)
 
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self.expand_layer(self.relu(self.squeeze(tensor)))
+        return self.expand_layer(self.relu(self.squeeze(tensor)))  # type: ignore[no-any-return]

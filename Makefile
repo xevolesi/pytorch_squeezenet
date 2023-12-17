@@ -15,7 +15,10 @@ format:
 	ruff format .
 	ruff check . --fix
 
+mypy_check:
+	mypy --strict .
+
 run_tests: 
 	IS_LOCAL_RUN=1 pytest -svvv tests/
 
-pre_push_test: lint run_tests
+pre_push_test: lint mypy_check run_tests

@@ -52,7 +52,8 @@ class SqueezeNet(nn.Module):
             if not isinstance(module, nn.Conv2d):
                 continue
             torch.nn.init.kaiming_uniform_(module.weight, mode="fan_in", nonlinearity="relu")
-            torch.nn.init.constant_(module.bias, 0)
+            if module.bias is not None:
+                torch.nn.init.constant_(module.bias, 0)
 
         # Initialize final convolution with N(0.0, 0.01).
         torch.nn.init.normal_(self.final_conv[0].weight, 0.0, 0.01)
