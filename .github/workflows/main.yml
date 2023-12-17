@@ -1,0 +1,40 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  PYTHONPATH: ./
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libturbojpeg libgl1-mesa-glx
+        python -m pip install --upgrade pip
+        pip install -r requirements.dev.txt
+    - name: Lint with Ruff
+      run: |
+          ruff format --diff --quiet --check .
+          ruff check . --fix --show-fixes
+    - name: Check typehinting with mypy
+      run: |
+          mypy --strict .
+    - name: Test with pytest
+      run: |
+        pytest -svvv tests
