@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 env:
-  PYTHONPATH: source/${PYTHONPATH}
+  PYTHONPATH: ./
 
 permissions:
   contents: read
