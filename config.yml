@@ -1,0 +1,8 @@
+training:
+  batch_size: 32
+  image_size: 227
+
+model:
+  __name__: source.models.SqueezeNet
+  in_channels: 3
+  num_classes: 1000
