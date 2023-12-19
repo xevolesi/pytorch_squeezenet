@@ -46,13 +46,11 @@ class SqueezeNet(nn.Module):
         Biases were initialized as zeroes.
         Final convolution was initialized using N(0.0, 0.01).
         """
-        # It seems that we need to use torch.nn.init.kaiming_uniform_
-        # to meet the formula: sqrt(3 / fan_mode). But it's not clear
-        # what mode to use `fan_in` or `fan_out`.
         for module in self.features.modules():
             if not isinstance(module, nn.Conv2d):
                 continue
-            torch.nn.init.kaiming_uniform_(module.weight, mode="fan_in", nonlinearity="relu")
+            n = module.in_channels + module.out_channels
+            torch.nn.init.uniform_(module.weight, -((3.0 / n) ** 0.5), (3.0 / n) ** 0.5)
             if module.bias is not None:
                 torch.nn.init.constant_(module.bias, 0)
 
