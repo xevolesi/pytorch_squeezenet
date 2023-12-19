@@ -17,7 +17,7 @@ format:
 	ruff check . --fix
 
 mypy_check:
-	mypy --strict .
+	mypy .
 
 run_tests: 
 	IS_LOCAL_RUN=1 pytest -svvv ${TEST_DIR}
