@@ -1,4 +1,7 @@
 # pytorch_squeezenet
+Implementation of [SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size](https://arxiv.org/abs/1602.07360v4) by `Forrest N. Iandola, Song Han, Matthew W. Moskewicz, Khalid Ashraf, William J. Dally, Kurt Keutzer`.
+
+# Results
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:

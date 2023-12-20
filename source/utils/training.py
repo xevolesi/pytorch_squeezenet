@@ -1,19 +1,26 @@
+
 import addict
 import torch
 from loguru import logger
 
 from source.datasets.imagenet import create_dataloaders
 from source.metrics import calculate_accuracy, calculate_top_5_accuracy
-from source.models import SqueezeNet
+from source.utils.general import get_object_from_dict
 
 
 def train(config: addict.Dict) -> None:
-    device = torch.device(config.training.device)
-    model = SqueezeNet(config.model.in_channels, config.model.num_classes).to(device)
-    optimizer = torch.optim.SGD(model.parameters(), 0.04, weight_decay=0.0002, momentum=0.9)
-    lr_scheduler = torch.optim.lr_scheduler.PolynomialLR(optimizer, total_iters=config.training.epochs)
-    criterion = torch.nn.CrossEntropyLoss()
     dataloaders = create_dataloaders(config)
+    if config.training.overfit_single_batch:
+        single_batch = next(iter(dataloaders["train"]))
+        dataloaders = {subset: [single_batch] for subset in dataloaders}
+
+    device = torch.device(config.training.device)
+    model: torch.nn.Module = get_object_from_dict(config.model).to(device)
+    criterion: torch.nn.modules.loss._WeightedLoss = get_object_from_dict(config.criterion)
+    optimizer: torch.optim.Optimizer = get_object_from_dict(config.optimizer, params=model.parameters())
+    lr_scheduler: torch.optim.lr_scheduler.LRScheduler = get_object_from_dict(
+        config.scheduler, optimizer=optimizer, total_iters=config.training.epochs
+    )
 
     for epoch in range(config.training.epochs):
         training_loss = 0.0
@@ -47,8 +54,8 @@ def train(config: addict.Dict) -> None:
                 output = model(images)
                 loss = criterion(output, labels)
                 validation_loss += loss.item()
-            val_acc += calculate_accuracy(output, labels).item()
-            val_acc_top5 += calculate_top_5_accuracy(output, labels).item()
+                val_acc += calculate_accuracy(output, labels).item()
+                val_acc_top5 += calculate_top_5_accuracy(output, labels).item()
 
         logger.info(
             (
