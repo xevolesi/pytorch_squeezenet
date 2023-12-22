@@ -1,7 +1,16 @@
+import os
 import pathlib
 
 import addict
 import torch
+
+try:
+    from dotenv import load_dotenv
+
+    import wandb
+except ImportError:
+    load_dotenv = None
+    wandb = None
 
 from source.utils.general import read_config, seed_everything
 from source.utils.training import train
@@ -15,10 +24,18 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 
+# Load envvars from .env.
+if load_dotenv is not None and pathlib.Path(".env").exists():
+    load_dotenv(".env")
+
 
 def main(config: addict.Dict) -> None:
+    if wandb is None or os.getenv("WANDB_API_KEY") is None:
+        config.training.use_wandb = False
+    run = wandb.init(project="SqueezeNet", config=config) if config.training.use_wandb else None
     seed_everything(config)
-    train(config)
+    train(config, run)
+    run.finish()
 
 
 if __name__ == "__main__":

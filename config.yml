@@ -2,15 +2,18 @@ path:
   dataset:
     root_dir: /home/xevolesi/Datasets/ImageNet
     meta_file_path: /home/xevolesi/Datasets/ImageNet/meta.json
+  
+  weights_folder_path: weights/
 
 training:
+  use_wandb: true
   seed: 42
   overfit_single_batch: false
   batch_size: 512
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
-  epochs: 100
+  epochs: 68
 
 model:
   __class_fullname__: source.models.SqueezeNet

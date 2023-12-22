@@ -81,3 +81,9 @@ def seed_everything(config: addict.Dict, local_rank: int = 0) -> None:
     os.environ["PYTHONHASHSEED"] = str(config.training.seed + local_rank)
     torch.cuda.manual_seed(config.training.seed + local_rank)
     torch.cuda.manual_seed_all(config.training.seed + local_rank)
+
+
+def get_cpu_state_dict(model: torch.nn.Module) -> dict[str, torch.Tensor]:
+    if isinstance(model, torch.nn.parallel.DistributedDataParallel | torch.nn.DataParallel):
+        model = model.module
+    return {name: tensor.detach().cpu() for name, tensor in model.state_dict().items()}

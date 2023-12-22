@@ -24,3 +24,4 @@ pip install --upgrade pip
 ```
 pip install -r requirements.txt
 ```
+6. If you want to use `W&B` logger then install `requirements.optional.txt` by `pip install -r requirements.optional.txt`. And create `.env` file and put `WANDB_API_KEY` inside `.env`. You can find example in `.env-example`.

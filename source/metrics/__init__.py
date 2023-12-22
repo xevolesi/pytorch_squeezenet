@@ -16,5 +16,5 @@ def calculate_top_5_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> torc
     correct = y_pred == target_reshaped
     ind_which_topk_matched_truth = correct[:5]
     flattened_indicator_which_topk_matched_truth = ind_which_topk_matched_truth.reshape(-1).float()
-    tot_correct_topk = flattened_indicator_which_topk_matched_truth.float().sum(dim=0, keepdim=True)
+    tot_correct_topk = flattened_indicator_which_topk_matched_truth.float().sum(dim=0)
     return tot_correct_topk / batch_size
