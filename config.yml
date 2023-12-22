@@ -1,19 +1,41 @@
 path:
   dataset:
+
+    # Path to ImageNet folder.
     root_dir: /home/xevolesi/Datasets/ImageNet
+    
+    # Path to ImageNet `meta.json` file.
     meta_file_path: /home/xevolesi/Datasets/ImageNet/meta.json
 
+  # Path to folder for storing weights.
+  weights_folder_path: weights/
+
 training:
+  use_wandb: true
+  seed: 42
+  overfit_single_batch: false
   batch_size: 512
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
-  epochs: 100
+  epochs: 68
 
 model:
-  __name__: source.models.SqueezeNet
+  __class_fullname__: source.models.SqueezeNet
   in_channels: 3
   num_classes: 1000
+
+optimizer:
+  __class_fullname__: torch.optim.SGD
+  lr: 0.04
+  weight_decay: 0.0002
+  momentum: 0.9
+
+criterion:
+  __class_fullname__: torch.nn.CrossEntropyLoss
+
+scheduler:
+  __class_fullname__: torch.optim.lr_scheduler.PolynomialLR
 
 augmentations:
   train:
