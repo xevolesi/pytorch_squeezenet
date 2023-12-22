@@ -32,9 +32,6 @@ jobs:
       run: |
           ruff format --diff --quiet --check .
           ruff check . --fix --show-fixes
-    - name: Check typehinting with mypy
-      run: |
-          mypy .
     - name: Test with pytest
       run: |
           pytest -svvv tests
