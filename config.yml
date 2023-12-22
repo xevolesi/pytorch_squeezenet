@@ -1,8 +1,13 @@
 path:
   dataset:
+
+    # Path to ImageNet folder.
     root_dir: /home/xevolesi/Datasets/ImageNet
+    
+    # Path to ImageNet `meta.json` file.
     meta_file_path: /home/xevolesi/Datasets/ImageNet/meta.json
-  
+
+  # Path to folder for storing weights.
   weights_folder_path: weights/
 
 training:
