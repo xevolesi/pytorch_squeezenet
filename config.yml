@@ -18,7 +18,7 @@ training:
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
-  epochs: 68
+  epochs: 75
 
 model:
   __class_fullname__: source.models.SqueezeNet
@@ -36,6 +36,7 @@ criterion:
 
 scheduler:
   __class_fullname__: torch.optim.lr_scheduler.PolynomialLR
+  total_iters: 170000
 
 augmentations:
   train:
