@@ -3,14 +3,13 @@ from pathlib import Path
 
 import addict
 import albumentations as album
-import cv2
 import torch
 from torch.utils.data import DataLoader, Dataset
 
 from source.utils.augmentations import get_albumentation_augs
 from source.utils.custom_types import DatumDict
 
-from .utils import DatasetMode
+from .utils import DatasetMode, read_image
 
 
 class ImageNet(Dataset):  # type: ignore[type-arg]
@@ -32,9 +31,7 @@ class ImageNet(Dataset):  # type: ignore[type-arg]
         self.labels = list(map(self.get_label_from_path, self.image_paths))
 
     def __getitem__(self, index: int) -> DatumDict:
-        image_path = self.image_paths[index]
-
-        image = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+        image = read_image(self.image_paths[index])
         image_label = self.labels[index]
 
         if self.transforms is not None:
