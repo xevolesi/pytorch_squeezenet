@@ -35,15 +35,12 @@ def train(config: addict.Dict, wandb_run: Run | None = None) -> None:
     model: torch.nn.Module = get_object_from_dict(config.model).to(device)
     criterion: _WeightedLoss = get_object_from_dict(config.criterion)
     optimizer: Optimizer = get_object_from_dict(config.optimizer, params=model.parameters())
-    lr_scheduler: LRScheduler = get_object_from_dict(
-        config.scheduler, optimizer=optimizer, total_iters=config.training.epochs
-    )
+    lr_scheduler: LRScheduler = get_object_from_dict(config.scheduler, optimizer=optimizer)
 
     best_weights = None
     best_top1_acc = float("-inf")
     for epoch in range(config.training.epochs):
-        training_result = train_one_epoch(model, dataloaders["train"], optimizer, criterion, device)
-        lr_scheduler.step()
+        training_result = train_one_epoch(model, dataloaders["train"], optimizer, criterion, device, lr_scheduler)
         validation_result = validate_one_epoch(model, dataloaders["val"], criterion, device)
 
         if validation_result["VALIDATION_ACC@1"] > best_top1_acc:
@@ -87,6 +84,7 @@ def train_one_epoch(
     optimizer: Optimizer,
     criterion: _WeightedLoss,
     device: torch.device,
+    lr_scheduler: LRScheduler | None = None,
 ) -> defaultdict[str, float]:
     model.train()
     training_results = defaultdict(lambda: torch.as_tensor(0.0, device=device))
@@ -103,6 +101,11 @@ def train_one_epoch(
         training_results["TRAINING_LOSS"] += loss
         training_results["TRAINING_ACC@1"] += calculate_accuracy(output, labels)
         training_results["TRAINING_ACC@5"] += calculate_top_5_accuracy(output, labels)
+
+        # As far as i understand in original paper learning ratw was
+        # decreased linearly after each batch.
+        if lr_scheduler is not None:
+            lr_scheduler.step()
 
     for result_name in training_results:
         training_results[result_name] /= len(dataloader)
