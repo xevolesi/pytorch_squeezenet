@@ -31,15 +31,28 @@ def train(config: addict.Dict, wandb_run: Run | None = None) -> None:
         single_batch = next(iter(dataloaders["train"]))
         dataloaders = {subset: [single_batch] for subset in dataloaders}
 
+    start_epoch = 0
     device = torch.device(config.training.device)
     model: torch.nn.Module = get_object_from_dict(config.model).to(device)
     criterion: _WeightedLoss = get_object_from_dict(config.criterion)
     optimizer: Optimizer = get_object_from_dict(config.optimizer, params=model.parameters())
     lr_scheduler: LRScheduler = get_object_from_dict(config.scheduler, optimizer=optimizer)
 
+    if config.training.resume.checkpoint_path is not None:
+        full_ckpt = torch.load(config.training.resume.checkpoint_path)
+        model.load_state_dict(full_ckpt["model"])
+        optimizer.load_state_dict(full_ckpt["optimizer"])
+        criterion.load_state_dict(full_ckpt["criterion"])
+        if lr_scheduler is not None:
+            lr_scheduler.load_state_dict(full_ckpt["scheduler"])
+        start_epoch = full_ckpt["epoch"] + 1
+        logger.info("Resuming training from {epoch} epoch", epoch=start_epoch)
+
     best_weights = None
     best_top1_acc = float("-inf")
-    for epoch in range(config.training.epochs):
+    save_folder_path = Path(config.path.weights_folder_path) / f"{wandb_run._run_id}"
+    save_folder_path.mkdir(parents=True, exist_ok=True)
+    for epoch in range(start_epoch, config.training.epochs):
         training_result = train_one_epoch(model, dataloaders["train"], optimizer, criterion, device, lr_scheduler)
         validation_result = validate_one_epoch(model, dataloaders["val"], criterion, device)
 
@@ -71,11 +84,24 @@ def train(config: addict.Dict, wandb_run: Run | None = None) -> None:
                     "Validation Acc@1": validation_result["VALIDATION_ACC@1"],
                     "Validation Acc@5": validation_result["VALIDATION_ACC@5"],
                     "LR": lr_scheduler.get_last_lr()[0],
-                }
+                },
+                step=epoch,
             )
-    save_path = Path(config.path.weights_folder_path) / f"{wandb_run._run_id}"
-    save_path.mkdir(parents=True, exist_ok=True)
-    torch.save(best_weights, (save_path / "state_dict.pth").as_posix())
+
+        # Save full checkpoint to be able to resume training.
+        full_ckpt = {
+            "epoch": epoch,
+            "model": get_cpu_state_dict(model),
+            "optimizer": optimizer.state_dict(),
+            "criterion": criterion.state_dict(),
+            "scheduler": lr_scheduler.state_dict() if lr_scheduler is not None else None,
+        }
+        training_checkpoint_folder_path = save_folder_path / "training_checkpoints"
+        training_checkpoint_folder_path.mkdir(exist_ok=True, parents=True)
+        torch.save(full_ckpt, (training_checkpoint_folder_path / f"full_ckpt_{epoch}.pth"))
+
+    # Save best model only checkpoint.
+    torch.save(best_weights, (save_folder_path / "state_dict.pth").as_posix())
 
 
 def train_one_epoch(
