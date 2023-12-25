@@ -11,6 +11,21 @@ path:
   weights_folder_path: weights/
 
 training:
+
+  # This section control the resuming behavior.
+  resume:
+
+    # If w&B run id provided then the system will try to resume
+    # failed W&B session.
+    wb_run_id: xk9u0653
+
+    # Path to full checkpoint with:
+    # model
+    # optimizer
+    # criterion
+    # lr scheduler
+    checkpoint_path: weights/xk9u0653/training_checkpoints/full_ckpt_1.pth
+
   use_wandb: true
   seed: 42
   overfit_single_batch: false

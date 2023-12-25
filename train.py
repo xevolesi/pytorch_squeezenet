@@ -32,7 +32,12 @@ if load_dotenv is not None and pathlib.Path(".env").exists():
 def main(config: addict.Dict) -> None:
     if wandb is None or os.getenv("WANDB_API_KEY") is None:
         config.training.use_wandb = False
-    run = wandb.init(project="SqueezeNet", config=config) if config.training.use_wandb else None
+
+    run = (
+        wandb.init(id=config.training.resume.wb_run_id, project="SqueezeNet", config=config)
+        if config.training.use_wandb
+        else None
+    )
     seed_everything(config)
     train(config, run)
     run.finish()
