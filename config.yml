@@ -17,23 +17,23 @@ training:
 
     # If w&B run id provided then the system will try to resume
     # failed W&B session.
-    wb_run_id: xk9u0653
+    wb_run_id: null
 
     # Path to full checkpoint with:
     # model
     # optimizer
     # criterion
     # lr scheduler
-    checkpoint_path: weights/xk9u0653/training_checkpoints/full_ckpt_1.pth
+    checkpoint_path: null
 
-  use_wandb: true
+  use_wandb: false
   seed: 42
-  overfit_single_batch: false
-  batch_size: 512
+  overfit_single_batch: true
+  batch_size: 8
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
-  epochs: 75
+  epochs: 67
 
 model:
   __class_fullname__: source.models.SqueezeNet

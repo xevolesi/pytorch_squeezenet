@@ -11,7 +11,12 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
 5. I also tried to calculate how many epochs i need to train to match `170_000` batches as described in `.prototxt` file and got `~67` epochs to train.
 
 Here is the results of reproduction:
-1. Simple SqueezeNet (without skip-connections): https://wandb.ai/xevolesi/SqueezeNet/runs/xk9u0653/overview?workspace=user-xevolesi. I was able to get `56.6` top-1 validation accuracy instead of `57.5` as authors reported. But as you can see there is quite obvious increasing trend for top-1 and top-5 validation accuracies so i think that if i train longer i can easilly achieve authors results or even more.
+1. Simple SqueezeNet (without skip-connections): https://wandb.ai/xevolesi/SqueezeNet/runs/xk9u0653/overview?workspace=user-xevolesi. I was able to get `56.6` top-1 validation accuracy instead of `57.5` as authors reported. But as you can see there is quite obvious increasing trend for top-1 and top-5 validation accuracies so i think that if i train longer i can easilly achieve authors results or even more;
+2. SqueezeNet with simple bypass connections:
+
+    2.1 I was not able to reproduce the results with bypass connections. Here is the [experiment with the same hyperparameters](https://wandb.ai/xevolesi/SqueezeNet/runs/vfi0r453/overview?workspace=user-xevolesi);
+
+    2.2 I tried different learning rates: [LR=0.03](https://wandb.ai/xevolesi/SqueezeNet/runs/42usodxu/overview?workspace=user-xevolesi), [LR=0.02](https://wandb.ai/xevolesi/SqueezeNet/runs/jky2j69o/overview?workspace=user-xevolesi), [LR=0.01](https://wandb.ai/xevolesi/SqueezeNet/runs/q42atfuk/overview?workspace=user-xevolesi), but the result was sligtly worse than without simple bypass connections.
 
 
 # How to use
