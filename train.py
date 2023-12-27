@@ -40,7 +40,8 @@ def main(config: addict.Dict) -> None:
     )
     seed_everything(config)
     train(config, run)
-    run.finish()
+    if run is not None:
+        run.finish()
 
 
 if __name__ == "__main__":

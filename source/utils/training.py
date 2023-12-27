@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pytz
 import torch
 from loguru import logger
 
@@ -50,7 +52,11 @@ def train(config: addict.Dict, wandb_run: Run | None = None) -> None:
 
     best_weights = None
     best_top1_acc = float("-inf")
-    save_folder_path = Path(config.path.weights_folder_path) / f"{wandb_run._run_id}"
+
+    run_id = datetime.now(tz=pytz.utc).strftime("%m/%d/%Y-%H:%M:%S")
+    if wandb_run is not None:
+        run_id = wandb_run._run_id
+    save_folder_path = Path(config.path.weights_folder_path) / f"{run_id}"
     save_folder_path.mkdir(parents=True, exist_ok=True)
     for epoch in range(start_epoch, config.training.epochs):
         training_result = train_one_epoch(model, dataloaders["train"], optimizer, criterion, device, lr_scheduler)
