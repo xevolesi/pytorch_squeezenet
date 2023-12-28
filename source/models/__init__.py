@@ -1,3 +1,3 @@
-from .squeezenet import SqueezeNet
+from .squeezenet import SqueezeNetV1, SqueezeNetV11
 
-__all__ = ["SqueezeNet"]
+__all__ = ["SqueezeNetV1", "SqueezeNetV11"]
