@@ -1,0 +1,112 @@
+path:
+  dataset:
+
+    # Path to ImageNet folder.
+    root_dir: /home/xevolesi/Datasets/ImageNet
+    
+    # Path to ImageNet `meta.json` file.
+    meta_file_path: /home/xevolesi/Datasets/ImageNet/meta.json
+
+  # Path to folder for storing weights.
+  weights_folder_path: weights/
+
+training:
+
+  # This section control the resuming behavior.
+  resume:
+
+    # If w&B run id provided then the system will try to resume
+    # failed W&B session.
+    wb_run_id: null
+
+    # Path to full checkpoint with:
+    # model
+    # optimizer
+    # criterion
+    # lr scheduler
+    checkpoint_path: null
+
+  use_wandb: true
+  seed: 42
+  overfit_single_batch: false
+  batch_size: 512
+  image_size: 227
+  dataloader_num_workers: 6
+  device: cuda:0
+  epochs: 67
+
+model:
+  __class_fullname__: source.models.SqueezeNetV11
+  in_channels: 3
+  num_classes: 1000
+
+optimizer:
+  __class_fullname__: torch.optim.SGD
+  lr: 0.04
+  weight_decay: 0.0002
+  momentum: 0.9
+
+criterion:
+  __class_fullname__: torch.nn.CrossEntropyLoss
+
+scheduler:
+  __class_fullname__: torch.optim.lr_scheduler.PolynomialLR
+  total_iters: 170000
+
+augmentations:
+  train:
+    transform:
+      __class_fullname__: Compose
+      transforms:
+        - __class_fullname__: albumentations.augmentations.crops.transforms.RandomResizedCrop
+          height: 227
+          width: 227
+          always_apply: true
+
+        # To PyTorch tensors.
+        - __class_fullname__: albumentations.augmentations.transforms.Normalize
+          always_apply: true
+
+          # We won't divide by 255.
+          max_pixel_value: 1.0
+          mean:
+            - 123
+            - 117
+            - 104
+          
+          # Don't do Z-standardization.
+          std:
+            - 1
+            - 1
+            - 1
+        - __class_fullname__: albumentations.pytorch.transforms.ToTensorV2
+          always_apply: true
+  val:
+    transform:
+      __class_fullname__: Compose
+      transforms:
+        - __class_fullname__: albumentations.augmentations.geometric.resize.Resize
+          height: 288
+          width: 288
+          always_apply: true
+        - __class_fullname__: albumentations.augmentations.crops.transforms.CenterCrop
+          height: 227
+          width: 227
+          always_apply: true
+
+        # To PyTorch tensors.
+        - __class_fullname__: albumentations.augmentations.transforms.Normalize
+          always_apply: true
+          # We won't divide by 255.
+          max_pixel_value: 1.0
+          mean:
+            - 123
+            - 117
+            - 104
+          # Don't do Z-standardization.
+          std:
+            - 1
+            - 1
+            - 1
+        - __class_fullname__: albumentations.pytorch.transforms.ToTensorV2
+          always_apply: true
