@@ -26,17 +26,17 @@ training:
     # lr scheduler
     checkpoint_path: null
 
-  use_wandb: false
+  use_wandb: true
   seed: 42
-  overfit_single_batch: true
-  batch_size: 8
+  overfit_single_batch: false
+  batch_size: 512
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
   epochs: 67
 
 model:
-  __class_fullname__: source.models.SqueezeNet
+  __class_fullname__: source.models.SqueezeNetV11
   in_channels: 3
   num_classes: 1000
 
