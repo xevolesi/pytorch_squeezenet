@@ -1,4 +1,4 @@
 from .expand import ExpandLayer
-from .fire import FireModule
+from .fire import fire_module_factory
 
-__all__ = ["ExpandLayer", "FireModule"]
+__all__ = ["ExpandLayer", "fire_module_factory"]
