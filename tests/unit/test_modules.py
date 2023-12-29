@@ -34,21 +34,25 @@ def test_expand_layer(
 
 @pytest.mark.parametrize(
     ("in_channels", "squeeze_channels", "out_channels", "skip_type"),
-    product((96, 128), (16, 32), (128, 256), ("simple", "complex", None, "none")),
+    product((96, 128, 256), (16, 32), (128, 256), ("simple", "complex", None, "none")),
 )
 def test_fire_module_factory(in_channels: int, squeeze_channels: int, out_channels: int, skip_type: str | None) -> None:
-    if skip_type not in {"simple", "complex", None}:
+    if skip_type is None:
+        module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        assert isinstance(module, FireModule)
+    elif skip_type == "simple":
+        if in_channels != out_channels:
+            with pytest.raises(ValueError, match=r".+?"):
+                module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        else:
+            module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+            assert isinstance(module, FirModuleSimpleSkip)
+    elif skip_type == "complex":
+        module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        assert isinstance(module, FireModuleComplexSkip)
+    else:
         with pytest.raises(ValueError, match=r".+?"):
             module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
-    else:
-        module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
-
-        if skip_type is None:
-            assert isinstance(module, FireModule)
-        elif skip_type == "simple":
-            assert isinstance(module, FirModuleSimpleSkip)
-        elif skip_type == "complex":
-            assert isinstance(module, FireModuleComplexSkip)
 
 
 @pytest.mark.parametrize(("in_channels", "squeeze_channels", "out_channels"), [(96, 16, 128), (128, 32, 256)])

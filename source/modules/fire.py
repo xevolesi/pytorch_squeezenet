@@ -49,6 +49,12 @@ class FirModuleSimpleSkip(FireModule):
             output channels of 1x1 expansion and 3x3 expansion;
         """
         super().__init__(in_channels, squeeze_channels, out_channels)
+        if in_channels != out_channels:
+            err_msg = (
+                f"Argument `in_channels` must be equal to argument `out_channels`, "
+                f"but got {in_channels} != {out_channels}"
+            )
+            raise ValueError(err_msg)
 
     def forward(self, tensor: Tensor) -> Tensor:
         return super().forward(tensor) + tensor
