@@ -1,8 +1,11 @@
+from itertools import product
+
 import addict
 import pytest
 import torch
 
-from source.modules import ExpandLayer, FireModule
+from source.modules import ExpandLayer, fire_module_factory
+from source.modules.fire import FireModule, FireModuleComplexSkip, FirModuleSimpleSkip
 
 _RANDOM_TENSOR_SPATIAL_SIZE: tuple[int, int] = (27, 27)
 
@@ -29,9 +32,54 @@ def test_expand_layer(
     )
 
 
+@pytest.mark.parametrize(
+    ("in_channels", "squeeze_channels", "out_channels", "skip_type"),
+    product((96, 128, 256), (16, 32), (128, 256), ("simple", "complex", None, "none")),
+)
+def test_fire_module_factory(in_channels: int, squeeze_channels: int, out_channels: int, skip_type: str | None) -> None:
+    if skip_type is None:
+        module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        assert isinstance(module, FireModule)
+    elif skip_type == "simple":
+        if in_channels != out_channels:
+            with pytest.raises(ValueError, match=r".+?"):
+                module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        else:
+            module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+            assert isinstance(module, FirModuleSimpleSkip)
+    elif skip_type == "complex":
+        module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+        assert isinstance(module, FireModuleComplexSkip)
+    else:
+        with pytest.raises(ValueError, match=r".+?"):
+            module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_type)
+
+
 @pytest.mark.parametrize(("in_channels", "squeeze_channels", "out_channels"), [(96, 16, 128), (128, 32, 256)])
 def test_fire_module(get_test_config: addict.Dict, in_channels: int, squeeze_channels: int, out_channels: int) -> None:
-    fire_module = FireModule(in_channels, squeeze_channels, out_channels)
+    fire_module = fire_module_factory(in_channels, squeeze_channels, out_channels)
+    random_tensor = torch.randn((get_test_config.training.batch_size, in_channels, *_RANDOM_TENSOR_SPATIAL_SIZE))
+    with torch.no_grad():
+        output = fire_module(random_tensor)
+    _assert_output(output, get_test_config.training.batch_size, out_channels, *_RANDOM_TENSOR_SPATIAL_SIZE)
+
+
+@pytest.mark.parametrize(("in_channels", "squeeze_channels", "out_channels"), [(128, 16, 128), (256, 32, 256)])
+def test_fire_module_with_simple_skips(
+    get_test_config: addict.Dict, in_channels: int, squeeze_channels: int, out_channels: int
+) -> None:
+    fire_module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_connection_type="simple")
+    random_tensor = torch.randn((get_test_config.training.batch_size, in_channels, *_RANDOM_TENSOR_SPATIAL_SIZE))
+    with torch.no_grad():
+        output = fire_module(random_tensor)
+    _assert_output(output, get_test_config.training.batch_size, out_channels, *_RANDOM_TENSOR_SPATIAL_SIZE)
+
+
+@pytest.mark.parametrize(("in_channels", "squeeze_channels", "out_channels"), [(96, 16, 128), (128, 32, 256)])
+def test_fire_module_with_complex_skips(
+    get_test_config: addict.Dict, in_channels: int, squeeze_channels: int, out_channels: int
+) -> None:
+    fire_module = fire_module_factory(in_channels, squeeze_channels, out_channels, skip_connection_type="complex")
     random_tensor = torch.randn((get_test_config.training.batch_size, in_channels, *_RANDOM_TENSOR_SPATIAL_SIZE))
     with torch.no_grad():
         output = fire_module(random_tensor)

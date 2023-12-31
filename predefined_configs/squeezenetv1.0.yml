@@ -36,9 +36,10 @@ training:
   epochs: 67
 
 model:
-  __class_fullname__: source.models.SqueezeNetV11
+  __class_fullname__: source.models.SqueezeNetV1
   in_channels: 3
   num_classes: 1000
+  skip_connection_type: null
 
 optimizer:
   __class_fullname__: torch.optim.SGD

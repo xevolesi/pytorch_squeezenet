@@ -29,7 +29,7 @@ training:
   use_wandb: true
   seed: 42
   overfit_single_batch: false
-  batch_size: 512
+  batch_size: 256
   image_size: 227
   dataloader_num_workers: 6
   device: cuda:0
@@ -39,6 +39,7 @@ model:
   __class_fullname__: source.models.SqueezeNetV1
   in_channels: 3
   num_classes: 1000
+  skip_connection_type: complex
 
 optimizer:
   __class_fullname__: torch.optim.SGD
