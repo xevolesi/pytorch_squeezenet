@@ -19,7 +19,7 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
 ## SqueezeNet 1.1
  - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/i9a39wo6/overview?workspace=user-xevolesi). I was able to get `54.6` top-1 validation accuracy and `78.0` top-5 validation accuracy without any changes in hyperparameters. It's really much more efficient without any accuracy drop;
  - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/shqjq8ut/overview?workspace=user-xevolesi). Same hyperparameters. The model achived `53.7` top-1 validation accuracy and `77.3` top-5 validation accuracy;
- - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/iikz83kq/overview?workspace=user-xevolesi). Same hyperparameters; As yoy can see this approach coudn't learn anything;
+ - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/aie7p5wn/overview?workspace=user-xevolesi). Failed with `CUDA OOM` error.
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
