@@ -45,3 +45,24 @@ pip install -r requirements.txt
 6. If you want to use `W&B` logger then install `requirements.optional.txt` by `pip install -r requirements.optional.txt`. And create `.env` file and put `WANDB_API_KEY` inside `.env`. You can find example in `.env-example`.
 7. Fill in `config.yml` file according to your settings.
 8. Run `python train.py`
+
+# Export to ONNX
+To export the model just do:
+
+```
+python export_to_onnx.py \
+		--config %path to config.yml% \
+		--torch_weights %path to PyTorch weights% \
+		--onnx_path %path tot ONNX file% \
+		--image_size %Image height and image width separated by single comma%
+```
+
+Example of command to export `squeezenet-v1.1`:
+
+```
+python export_to_onnx.py \
+		--config predefined_configs/squeezenetv1.1.yml \
+		--torch_weights weights/i9a39wo6/state_dict.pth \
+		--onnx_path ./squeezenetv11.onnx \
+		--image_size 224,224 \
+```
