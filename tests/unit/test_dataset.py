@@ -20,14 +20,18 @@ def _assert_dataset_sample_without_augs(sample: DatumDict) -> None:
     assert isinstance(sample["label"], int)
 
 
-def _assert_dataset_sample_with_augs(sample: DatumDict) -> None:
+def _assert_dataset_sample_with_augs(sample: DatumDict, subset: str) -> None:
     assert "image" in sample
     assert "label" in sample
     assert isinstance(sample["image"], torch.Tensor)
     assert isinstance(sample["label"], int)
-    assert sample["image"].shape == (3, 227, 227)
     assert sample["image"].dtype == torch.float32
     assert 0 <= sample["label"] <= 999
+
+    target_shape = (3, 227, 227)
+    if subset == "VAL":
+        target_shape = (3, 224, 224)
+    assert sample["image"].shape == target_shape
 
 
 @pytest.mark.parametrize("mode", ["TRAIN", "VAL"])
@@ -50,10 +54,10 @@ def test_imagenet(get_test_config: addict.Dict, mode: str) -> None:
     assert len(dataset) == len(dataset.image_paths) == len(dataset.labels)
     random_samples = random.choices(dataset, k=10)
     for sample in random_samples:
-        _assert_dataset_sample_with_augs(sample)
+        _assert_dataset_sample_with_augs(sample, mode)
 
 
-def _assert_dataloader(dataloader: DataLoader, batch_size: int) -> None:  # type: ignore[type-arg]
+def _assert_dataloader(dataloader: DataLoader, batch_size: int, subset_name: str) -> None:  # type: ignore[type-arg]
     for batch in dataloader:
         assert "image" in batch
         assert "label" in batch
@@ -65,9 +69,13 @@ def _assert_dataloader(dataloader: DataLoader, batch_size: int) -> None:  # type
         assert batch_dim_image == batch_dim_label
         assert batch_dim_image <= batch_size
         assert batch_dim_label <= batch_size
-        assert batch["image"].shape[1:] == (3, 227, 227)
         assert batch["image"].dtype == torch.float32
         assert batch["label"].dtype == torch.long
+
+        target_shape = (3, 227, 227)
+        if subset_name == "val":
+            target_shape = (3, 224, 224)
+        assert batch["image"].shape[1:] == target_shape
 
 
 def test_create_dataloaders(get_test_config: addict.Dict) -> None:
@@ -75,5 +83,5 @@ def test_create_dataloaders(get_test_config: addict.Dict) -> None:
         pytest.skip("Skip data tests for CI")
     get_test_config.training.batch_size = 32
     dataloaders = create_dataloaders(get_test_config)
-    for loader in dataloaders.values():
-        _assert_dataloader(loader, get_test_config.training.batch_size)
+    for subset_name, subset_loader in dataloaders.items():
+        _assert_dataloader(subset_loader, get_test_config.training.batch_size, subset_name)
