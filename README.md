@@ -5,9 +5,9 @@ Implementation of [SqueezeNet: AlexNet-level accuracy with 50x fewer parameters 
 To reproduce the article I mainly focused on the hyperparameters in [this](https://github.com/forresti/SqueezeNet/blob/master/SqueezeNet_v1.0/solver.prototxt) `.prototxt` file from paper's authors. In addition i used:
 
 1. Weights initialization described in paper;
-2. Image normalization from `.prototxt` file (only mean substraction, even without division by 255);
-3. Almost no augmentations, except `RandomResizedCrop`. I didn't find any mention of any augmentations in paper or in `.prototxt` file;
-4. I didn't use any gradient accumulation techniques as described in `.prototxt` and directly trained using `batch_size=512`.`
+2. There is not much information about image preprocessing in paper, but there are some issues with author's answers about image preprocessing and augmentation ([link 1](https://github.com/forresti/SqueezeNet/issues/8), [link2](https://github.com/forresti/SqueezeNet/issues/62)). There is also `.prototxt` file with only mean substraction, even without division by 255. So, i used the author's answers to build augmentation and preprocessing pipeline with [albumentation](https://github.com/albumentations-team/albumentations);
+3. I used `torch.optim.lr_scheduler.PolynomialLR` and do it's step __after each batch__. As far as i understand in `Caffe` it works like this;
+4. I didn't use any gradient accumulation techniques as described in `.prototxt` and directly trained using `batch_size=512`;
 5. I also tried to calculate how many epochs i need to train to match `170_000` batches as described in `.prototxt` file and got `~67` epochs to train.
 
 ## SqueezeNet 1.0
@@ -17,9 +17,9 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
  - [Experiment with complex bypass connections but without ReLU in skip-connections](https://wandb.ai/xevolesi/SqueezeNet/runs/5owzmth4/overview?workspace=user-xevolesi).
 
 ## SqueezeNet 1.1
- - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/ebieb0gy/overview?workspace=user-xevolesi). I was able to get `56.1` top-1 validation accuracy and `79.0` top-5 validation accuracy without any changes in hyperparameters. It's really much more efficient without any accuracy drop;
- - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/emyg6tuz/overview). Same hyperparameters. The model achived almost the same top-1 and top-5 accuracies as the base model;
- - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/nhnaw96z/overview?workspace=user-xevolesi). Same hyperparameters; As yoy can see this approach coudn't learn anything;
+ - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/i9a39wo6/overview?workspace=user-xevolesi). I was able to get `54.6` top-1 validation accuracy and `78.0` top-5 validation accuracy without any changes in hyperparameters. It's really much more efficient without any accuracy drop;
+ - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/shqjq8ut/overview?workspace=user-xevolesi). Same hyperparameters. The model achived `53.7` top-1 validation accuracy and `77.3` top-5 validation accuracy;
+ - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/iikz83kq/overview?workspace=user-xevolesi). Same hyperparameters; As yoy can see this approach coudn't learn anything;
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
