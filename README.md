@@ -11,15 +11,12 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
 5. I also tried to calculate how many epochs i need to train to match `170_000` batches as described in `.prototxt` file and got `~67` epochs to train.
 
 ## SqueezeNet 1.0
- - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/4ynby67q/overview?workspace=user-xevolesi). I was able to get `56.4` top-1 validation accuracy and `79.2` top-5 validation accuracy instead of `57.5` and `80.3` as authors reported. This experiment was interrupted and the plots were captured only for the first 55 epochs instead of 67, иut the weight file you can download is provided after the full training;
- - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/q3wzwk8o/overview?workspace=user-xevolesi). Same hyperparameters; As yoy can see this approach coudn't learn anything;
- - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/5owzmth4/overview?workspace=user-xevolesi). It failed with `CUDA OOM` error with batch size 512. So i performed training with batch size 256. As you can see it came with `nan` for training and validation losses;
- - [Experiment with complex bypass connections but without ReLU in skip-connections](https://wandb.ai/xevolesi/SqueezeNet/runs/5owzmth4/overview?workspace=user-xevolesi).
+ - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/89e3ebaw/overview?workspace=user-xevolesi). I was able to get `56.0` top-1 validation accuracy and `79.0` top-5 validation accuracy instead of `57.5` and `80.3` as authors reported.
 
 ## SqueezeNet 1.1
  - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/i9a39wo6/overview?workspace=user-xevolesi). I was able to get `54.6` top-1 validation accuracy and `78.0` top-5 validation accuracy without any changes in hyperparameters. It's really much more efficient without any accuracy drop;
  - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/shqjq8ut/overview?workspace=user-xevolesi). Same hyperparameters. The model achived `53.7` top-1 validation accuracy and `77.3` top-5 validation accuracy;
- - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/aie7p5wn/overview?workspace=user-xevolesi). Failed with `CUDA OOM` error.
+ - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/iikz83kq/overview?workspace=user-xevolesi). Doesn't learn anything.
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
