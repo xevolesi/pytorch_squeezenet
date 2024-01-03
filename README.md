@@ -11,7 +11,9 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
 5. I also tried to calculate how many epochs i need to train to match `170_000` batches as described in `.prototxt` file and got `~67` epochs to train.
 
 ## SqueezeNet 1.0
- - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/89e3ebaw/overview?workspace=user-xevolesi). I was able to get `56.0` top-1 validation accuracy and `79.0` top-5 validation accuracy instead of `57.5` and `80.3` as authors reported.
+ - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/89e3ebaw/overview?workspace=user-xevolesi). I was able to get `56.0` top-1 validation accuracy and `79.0` top-5 validation accuracy instead of `57.5` and `80.3` as authors reported;
+ - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/4b8c64rt/overview?workspace=user-xevolesi). Same hyperparameters. The model achived `51.3` top-1 validation accuracy and `74.8` top-5 validation accuracy;
+ - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/iikz83kq/overview?workspace=user-xevolesi). Filed with `CUDA OOM` error. I tired to train with batch size = 384 ([link](https://wandb.ai/xevolesi/SqueezeNet/runs/zv7ap2ar)) but the loss was `nan`.
 
 ## SqueezeNet 1.1
  - [Base experiment](https://wandb.ai/xevolesi/SqueezeNet/runs/i9a39wo6/overview?workspace=user-xevolesi). I was able to get `54.6` top-1 validation accuracy and `78.0` top-5 validation accuracy without any changes in hyperparameters. It's really much more efficient without any accuracy drop;
