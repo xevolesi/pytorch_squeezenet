@@ -3,7 +3,7 @@ import pathlib
 import addict
 import pytest
 
-from source.models import SqueezeNetV1, SqueezeNetV11
+from source.models import SqueezeNetV1, SqueezeNetV11, SqueezeNetV12
 from source.utils.general import read_config
 
 _CONFIG_PATH = "config.yml"
@@ -24,3 +24,8 @@ def squeezenetv1(get_test_config: addict.Dict) -> SqueezeNetV1:
 @pytest.fixture(scope="session")
 def squeezenetv11(get_test_config: addict.Dict) -> SqueezeNetV11:
     return SqueezeNetV11(get_test_config.model.in_channels, get_test_config.model.num_classes)
+
+
+@pytest.fixture(scope="session")
+def squeezenetv12(get_test_config: addict.Dict) -> SqueezeNetV12:
+    return SqueezeNetV12(get_test_config.model.in_channels, get_test_config.model.num_classes)

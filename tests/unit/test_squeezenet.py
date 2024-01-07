@@ -2,7 +2,7 @@ import addict
 import pytest
 import torch
 
-from source.models import SqueezeNetV1, SqueezeNetV11
+from source.models import SqueezeNetV1, SqueezeNetV11, SqueezeNetV12
 
 
 def _assert_output(model_output: torch.Tensor, true_batch_size: int, true_n_classes: int) -> None:
@@ -11,13 +11,19 @@ def _assert_output(model_output: torch.Tensor, true_batch_size: int, true_n_clas
     assert n_classes == true_n_classes
 
 
-@pytest.mark.parametrize("version", ["1.0", "1.1"])
+@pytest.mark.parametrize("version", ["1.0", "1.1", "1.2"])
 def test_squeezenet(
-    version: str, get_test_config: addict.Dict, squeezenetv1: SqueezeNetV1, squeezenetv11: SqueezeNetV11
+    version: str,
+    get_test_config: addict.Dict,
+    squeezenetv1: SqueezeNetV1,
+    squeezenetv11: SqueezeNetV11,
+    squeezenetv12: SqueezeNetV12,
 ) -> None:
     model = squeezenetv1
     if version == "1.1":
         model = squeezenetv11
+    elif version == "1.2":
+        model = squeezenetv12
     random_tensor = torch.randn(
         get_test_config.training.batch_size, 3, get_test_config.training.image_size, get_test_config.training.image_size
     )
