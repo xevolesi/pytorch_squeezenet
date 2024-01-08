@@ -27,7 +27,8 @@ This is the model with some bag of freebies.
 - Substitute `final_conv` with single `torch.nn.Linear` layer, so we don't have convolution + ReLU for the final classification layer wich was quite strange decision since ReLU killed all logits that are below zero;
 - Standard PyTorch initialization for layers;
 - Add `BatchNorm2d` to the model;
-- Use standard modern Z-normalization for images (division by 255 and Z-standardization with ImageNet means and stds).
+- Use standard modern Z-normalization for images (division by 255 and Z-standardization with ImageNet means and stds);
+- Use `torch.optim.lr_scheduler.CosineAnnealingLR` instead of `torch.optim.lr_scheduler.PolynomialLR`.
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
