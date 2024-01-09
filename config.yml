@@ -34,6 +34,7 @@ training:
   dataloader_num_workers: 6
   device: cuda:0
   epochs: 67
+  ema_coef: 0.999
 
 model:
   __class_fullname__: source.models.SqueezeNetV12
