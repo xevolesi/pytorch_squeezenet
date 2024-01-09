@@ -59,10 +59,6 @@ augmentations:
     transform:
       __class_fullname__: Compose
       transforms:
-        - __class_fullname__: albumentations.augmentations.geometric.resize.Resize
-          height: 256
-          width: 256
-          always_apply: true
         - __class_fullname__: albumentations.augmentations.crops.transforms.RandomResizedCrop
           height: 227
           width: 227
