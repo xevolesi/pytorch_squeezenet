@@ -2,6 +2,7 @@ import torch
 from torch import Tensor, nn
 
 from .expand import ExpandLayer
+from .se_block import SEBlock
 
 
 class FireModule(nn.Module):
@@ -15,6 +16,7 @@ class FireModule(nn.Module):
         in_channels: int,
         squeeze_channels: int,
         out_channels: int,
+        use_se_block: bool = False,
         bn_in_expand: bool = False,
         bn_in_squeeze: bool = False,
     ) -> None:
@@ -26,6 +28,7 @@ class FireModule(nn.Module):
             out_channels: The number of output channels for fire module.
             Must be divisible by 2 since it consists of the number of
             output channels of 1x1 expansion and 3x3 expansion;
+            use_se_block: Whether to use Squeeze-and-Excitation block;
             bn_in_expand: Whether to use BatchNormalization layer in
             expand layer;
             bn_in_squeeze: Whether to use BatchNormalization layer in
@@ -43,8 +46,16 @@ class FireModule(nn.Module):
 
         self.expand_layer = ExpandLayer(squeeze_channels, out_channels // 2, out_channels // 2, bn_in_expand)
 
+        self.se = None
+        if use_se_block:
+            self.se = SEBlock(out_channels, squeeze_channels)
+
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self.expand_layer(self.squeeze(tensor))
+        block_output = self.expand_layer(self.squeeze(tensor))
+        if self.se is not None:
+            b, c, *_ = block_output.size()
+            block_output *= self.se(block_output).view(b, c, 1, 1)
+        return block_output
 
 
 class FirModuleSimpleSkip(FireModule):
@@ -59,6 +70,7 @@ class FirModuleSimpleSkip(FireModule):
         in_channels: int,
         squeeze_channels: int,
         out_channels: int,
+        use_se_block: bool = False,
         bn_in_expand: bool = False,
         bn_in_squeeze: bool = False,
     ) -> None:
@@ -70,32 +82,22 @@ class FirModuleSimpleSkip(FireModule):
             out_channels: The number of output channels for fire module.
             Must be divisible by 2 since it consists of the number of
             output channels of 1x1 expansion and 3x3 expansion;
+            use_se_block: Whether to use Squeeze-and-Excitation block;
             bn_in_expand: Whether to use BatchNormalization layer in
             expand layer;
             bn_in_squeeze: Whether to use BatchNormalization layer in
             squeeze layer.
         """
-        super().__init__(in_channels, squeeze_channels, out_channels, bn_in_expand, bn_in_squeeze)
+        super().__init__(in_channels, squeeze_channels, out_channels, use_se_block, bn_in_expand, bn_in_squeeze)
         if in_channels != out_channels:
             err_msg = (
                 f"Argument `in_channels` must be equal to argument `out_channels`, "
                 f"but got {in_channels} != {out_channels}"
             )
             raise ValueError(err_msg)
-        self.se = nn.Sequential(
-            nn.AdaptiveAvgPool2d((1, 1)),
-            nn.Flatten(1),
-            nn.Linear(out_channels, squeeze_channels, bias=False),
-            nn.ReLU(),
-            nn.Linear(squeeze_channels, out_channels, bias=False),
-            nn.Sigmoid(),
-        )
 
     def forward(self, tensor: Tensor) -> Tensor:
-        block_output = super().forward(tensor)
-        b, c, *_ = block_output.size()
-        se_weights = self.se(block_output).view(b, c, 1, 1)
-        return block_output * se_weights + tensor
+        return super().forward(tensor) + tensor
 
 
 class FireModuleComplexSkip(FireModule):
@@ -110,6 +112,7 @@ class FireModuleComplexSkip(FireModule):
         in_channels: int,
         squeeze_channels: int,
         out_channels: int,
+        use_se_block: bool = False,
         bn_in_expand: bool = False,
         bn_in_squeeze: bool = False,
     ) -> None:
@@ -121,12 +124,13 @@ class FireModuleComplexSkip(FireModule):
             out_channels: The number of output channels for fire module.
             Must be divisible by 2 since it consists of the number of
             output channels of 1x1 expansion and 3x3 expansion;
+            use_se_block: Whether to use Squeeze-and-Excitation block;
             bn_in_expand: Whether to use BatchNormalization layer in
             expand layer;
             bn_in_squeeze: Whether to use BatchNormalization layer in
             squeeze layer.
         """
-        super().__init__(in_channels, squeeze_channels, out_channels, bn_in_expand, bn_in_squeeze)
+        super().__init__(in_channels, squeeze_channels, out_channels, use_se_block, bn_in_expand, bn_in_squeeze)
 
         # If main path has batch normalization layer then let the
         # complex skip connection has it either.
@@ -134,26 +138,16 @@ class FireModuleComplexSkip(FireModule):
         if bn_in_squeeze:
             skip_conv_modules.append(nn.BatchNorm2d(out_channels))
         self.skip_conv = nn.Sequential(*skip_conv_modules)
-        self.se = nn.Sequential(
-            nn.AdaptiveAvgPool2d((1, 1)),
-            nn.Flatten(1),
-            nn.Linear(out_channels, squeeze_channels, bias=False),
-            nn.ReLU(),
-            nn.Linear(squeeze_channels, out_channels, bias=False),
-            nn.Sigmoid(),
-        )
 
     def forward(self, tensor: Tensor) -> Tensor:
-        block_output = super().forward(tensor)
-        b, c, *_ = block_output.size()
-        se_weights = self.se(block_output).view(b, c, 1, 1)
-        return block_output * se_weights + self.skip_conv(tensor)
+        return super().forward(tensor) + self.skip_conv(tensor)
 
 
 def fire_module_factory(
     in_channels: int,
     squeeze_channels: int,
     out_channels: int,
+    use_se_block: bool = False,
     bn_in_expand: bool = False,
     bn_in_squeeze: bool = False,
     skip_connection_type: str | None = None,
@@ -168,6 +162,7 @@ def fire_module_factory(
         "in_channels": in_channels,
         "out_channels": out_channels,
         "squeeze_channels": squeeze_channels,
+        "use_se_block": use_se_block,
         "bn_in_expand": bn_in_expand,
         "bn_in_squeeze": bn_in_squeeze,
     }
