@@ -82,9 +82,20 @@ class FirModuleSimpleSkip(FireModule):
                 f"but got {in_channels} != {out_channels}"
             )
             raise ValueError(err_msg)
+        self.se = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(1),
+            nn.Linear(out_channels, squeeze_channels, bias=False),
+            nn.ReLU(),
+            nn.Linear(squeeze_channels, out_channels, bias=False),
+            nn.Sigmoid(),
+        )
 
     def forward(self, tensor: Tensor) -> Tensor:
-        return super().forward(tensor) + tensor
+        block_output = super().forward(tensor)
+        b, c, *_ = block_output.size()
+        se_weights = self.se(block_output).view(b, c, 1, 1)
+        return block_output * se_weights + tensor
 
 
 class FireModuleComplexSkip(FireModule):
@@ -123,9 +134,20 @@ class FireModuleComplexSkip(FireModule):
         if bn_in_squeeze:
             skip_conv_modules.append(nn.BatchNorm2d(out_channels))
         self.skip_conv = nn.Sequential(*skip_conv_modules)
+        self.se = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(1),
+            nn.Linear(out_channels, squeeze_channels, bias=False),
+            nn.ReLU(),
+            nn.Linear(squeeze_channels, out_channels, bias=False),
+            nn.Sigmoid(),
+        )
 
     def forward(self, tensor: Tensor) -> Tensor:
-        return super().forward(tensor) + self.skip_conv(tensor)
+        block_output = super().forward(tensor)
+        b, c, *_ = block_output.size()
+        se_weights = self.se(block_output).view(b, c, 1, 1)
+        return block_output * se_weights + self.skip_conv(tensor)
 
 
 def fire_module_factory(

@@ -29,7 +29,8 @@ This is the model with some bag of freebies.
 - Add `BatchNorm2d` to the model;
 - Use standard modern Z-normalization for images (division by 255 and Z-standardization with ImageNet means and stds);
 - Use `torch.optim.lr_scheduler.CosineAnnealingLR` instead of `torch.optim.lr_scheduler.PolynomialLR`;
-- `RandomResizedCrop(227, 227)` instead of `Compose(Resized(256, 256), RandomResizedCrop(227, 227))`.
+- `RandomResizedCrop(227, 227)` instead of `Compose(Resized(256, 256), RandomResizedCrop(227, 227))`;
+- Add `SE-module`.
 
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
