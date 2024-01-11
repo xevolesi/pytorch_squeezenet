@@ -20,6 +20,20 @@ To reproduce the article I mainly focused on the hyperparameters in [this](https
  - [Experiment with simple bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/shqjq8ut/overview?workspace=user-xevolesi). Same hyperparameters. The model achived `53.7` top-1 validation accuracy and `77.3` top-5 validation accuracy;
  - [Experiment with complex bypass connections](https://wandb.ai/xevolesi/SqueezeNet/runs/iikz83kq/overview?workspace=user-xevolesi). Doesn't learn anything.
 
+# SqueezeNet 1.2
+This is the model with some bag of freebies.
+- In `ExpandLayer` use only one `torch.nn.ReLU` instead of two. Obviously, it's faster;
+- Swap first `torch.nn.MaxPoll2d` with first `torch.nn.ReLU`. This will lead to applying ReLU to the tensor with much less data which is much faster;
+- Substitute `final_conv` with single `torch.nn.Linear` layer, so we don't have convolution + ReLU for the final classification layer wich was quite strange decision since ReLU killed all logits that are below zero;
+- Standard PyTorch initialization for layers;
+- Add `BatchNorm2d` to the model;
+- Use standard modern Z-normalization for images (division by 255 and Z-standardization with ImageNet means and stds);
+- Use `torch.optim.lr_scheduler.CosineAnnealingLR` instead of `torch.optim.lr_scheduler.PolynomialLR`;
+- `RandomResizedCrop(227, 227)` instead of `Compose(Resized(256, 256), RandomResizedCrop(227, 227))`;
+- Add `SE-module`.
+
+[Experiment link](https://wandb.ai/xevolesi/SqueezeNet/runs/tg2yt980/overview?workspace=user-xevolesi). It achieved `61.8 %` top-1 accuracy and `84.6 %` top-5 accuracy.
+
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
 ```
