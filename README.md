@@ -32,6 +32,8 @@ This is the model with some bag of freebies.
 - `RandomResizedCrop(227, 227)` instead of `Compose(Resized(256, 256), RandomResizedCrop(227, 227))`;
 - Add `SE-module`.
 
+[Experiment link](https://wandb.ai/xevolesi/SqueezeNet/runs/tg2yt980/overview?workspace=user-xevolesi). It achieved `61.8 %` top-1 accuracy and `84.6 %` top-5 accuracy.
+
 # How to use
 1. Install `python 3.11`, `python3.11-dev` and `python3.11-venv`:
 ```
