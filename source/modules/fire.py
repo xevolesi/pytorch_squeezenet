@@ -54,7 +54,7 @@ class FireModule(nn.Module):
         block_output = self.expand_layer(self.squeeze(tensor))
         if self.se is not None:
             b, c, *_ = block_output.size()
-            block_output *= self.se(block_output).view(b, c, 1, 1)
+            block_output = block_output * self.se(block_output).view(b, c, 1, 1)
         return block_output
 
 
